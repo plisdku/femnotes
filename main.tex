@@ -1,0 +1,31 @@
+%\documentclass[11pt]{amsart}
+\documentclass{amsbook}
+\usepackage{geometry}                % See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}                   % ... or a4paper or a5paper or ... 
+%\geometry{landscape}                % Activate for for rotated page geometry
+%\usepackage[parfill]{parskip}    % Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{bbold}
+\usepackage{epstopdf} % for double-one identity matrix, \mathbb{1}.
+\usepackage{myMacros}
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+\title{Nodal FEM Notes}
+\author{Paul Hansen}
+%\date{}                                           % Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+\include{chapter01}
+\include{chapter02}
+\include{chapter03}
+\include{chapter04}
+
+%\nocite{*}
+\bibliographystyle{alpha}
+\bibliography{mybib}% Produces the bibliography via BibTeX.
+
+\end{document}

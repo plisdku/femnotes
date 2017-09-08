@@ -1,0 +1,65 @@
+\chapter{Directly-differentiated FEM}
+\label{chap:ddfem}
+
+\section{Sensitivity of the Objective Functional}
+
+We wish to derive the design sensitivity of a functional $F(\phi; \ve p)$ subject to the Poisson equation.  Throughout this chapter we will use $u \equiv \ppp{\phi}{p}$.  Let's take the functional to be of integral form first as in Chapter \ref{chap:preliminaries},
+%
+\begin{equation}
+F(\phi; \ve p) = \int_\Omega a \phi = \ve{a}^T Q \diag |J| \phi.
+\label{eqn:integralFunctional}
+\end{equation}
+%
+Then its sensitivity is as in Equation \ref{eqn:discreteFunctionalSensitivity},
+%
+\begin{equation}
+\dd{F}{p} = \dd{\ve a^T}{p} Q \diag |J| \phi + \ve a^T Q \dd{\, \diag |J|}{p} \phi + \ve a^T Q \diag |J| \dd{\phi}{p}.
+\label{eqn:integralFunctionalSensitivity}
+\end{equation}
+%
+By expressing it directly in discrete form we have handled both interior and boundary contributions to the sensitivity of \ref{eqn:integralFunctional}.
+
+We must solve for $\ddd{\phi}{p}$ to evaluate this design sensitivity.
+
+
+\section{Sensitivity of the Poisson Equation}
+
+To get $\ddd{\phi}{p}$, directly differentiate the FEM equations with respect to $p$.  The relevant vectors and matrices are
+%
+\begin{equation}
+\begin{aligned}
+\pp{D_x}{p}, 
+\pp{D_y}{p}, 
+\pp{\, \diag |J|}{p}, 
+\pp{\, \diag |J^\textrm{1d}|}{p}, 
+\pp{f}{p}, 
+\pp{e_n}{p}.
+\end{aligned}
+\end{equation}
+%
+We did all the hard work in Chapter \ref{chap:preliminaries} except perhaps for the 1d terms.  Note that $\ppp{Q}{p} = 0$ and $\ppp{Q^\textrm{1d}}{p} = 0$ because the quadrature matrix is expressed in the reference element.  Also $\ppp{f}{p}$ and $\ppp{e_n}{p}$ are considered to be \emph{given} and not derived from more fundamental quantities.
+
+Our strategy is to build the elemental matrices first then do some index mapping to assemble the global system matrix for the directly-differentiated system.  We solve for $\ddd{\phi}{p}$ then plug it into Equation \ref{eqn:integralFunctionalSensitivity} to get the design sensitivity.  Looks like it's just a bunch of awful plug-and-chug.  All the interesting pieces come from $\ppp{J}{p}$.
+
+\subsection{Directly-differentiated system}
+
+Group the terms of the discrete Poisson equation as
+%
+\begin{equation}
+M_1 \phi = M_2 f.
+\end{equation}
+%
+The directly-differentiated system is
+%
+\begin{equation}
+M_1 \pp{\phi}{p} = \pp{M_2}{p} f + M_2 \pp{f}{p} - \pp{M_1}{p} \phi.
+\end{equation}
+
+
+
+
+
+
+
+
+

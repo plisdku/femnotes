@@ -1,0 +1,51 @@
+\chapter{Curvilinear FEM}
+\label{chap:curvilinear_fem}
+
+\section{Notational conventions}
+
+Things are going to get seriously hirsute here.  I've been liberal with my use of boldface vector notation in my first drafts.  On the one hand, I have the coordinate transformations $\ve X$ and $\ve R$, which are boldfaced because they produce Cartesian vectors $(x,y)$ and $(r,s)$, respectively.  On the other hand each element has two arrays of nodal coordinates $\ve r$ and $\ve s$ which are boldfaced because I manipulate all the $r$ coordinates together as a single column vector and all the $s$ coordinates together likewise.  I will lose my mind if I keep this up.  Because my Cartesian vectors will have no more than 3 elements each, the pain of writing them out explicitly is somewhat less than the pain of writing out $N$ values at a time for $N$ nodes ($N \ge 3$ no matter what).  So where possible, from now on, boldface notation is used for quantities which are sampled at multiple points in space---unless otherwise noted.
+
+\section{Curvilinear coordinates}
+
+Dear reader, run out there and educate yourself on what ``isoparametric,'' ``superparametric'' and ``subparametric'' mean, and return here enlightened.  Remind me whether the polyhedral geometries of the previous sections are superparametric or subparametric, and provide a foolproof mnemonic to prevent me from ever forgetting again.
+
+The forward coordinate transformation $\ve X(\ve r)$ of chapter \ref{chap:preliminaries} (Figure \ref{fig:reference_simplex}) and its inverse $\ve R(\ve x)$ are linear.  We now consider a polynomial forward coordinate transformation and its inverse,
+%
+\begin{equation}
+\begin{bmatrix}
+x \\ y
+\end{bmatrix}
+=
+\begin{bmatrix}
+X(r, s) \\ Y(r,s)
+\end{bmatrix},
+\qquad
+\begin{bmatrix}
+r \\ s
+\end{bmatrix}
+=
+\begin{bmatrix}
+R(x, y) \\ S(x,y)
+\end{bmatrix}.
+\end{equation}
+%
+When $X$ and $Y$ are polynomial functions of $r$ and $s$, $R$ and $S$ are not in general polynomials.  (Consider $X(r) = r^2$ and its non-polynomial inverse mapping $R(x) = \sqrt{x}$.)  I think we'll have to invert them numerically with \emph{e.g.} Newton's method.
+
+Define the coordinate transformations using nodal polynomials by the usual scheme.  Within a single element let the nodal coordinates in the reference simplex be $\n{\ve r}, \n{\ve s}$ which map to $\n{\ve x}, \n{\ve y}$.  Then to evaluate at query points $\q{\ve r}, \q{\ve s}$ use interpolation,
+%
+\begin{equation}
+\begin{aligned}
+X(\q{\ve r}, \q{\ve s}) &= V(\q{\ve r}, \q{\ve s}) V(\n{\ve r}, \n{\ve s})^{-1} \n{\ve x} \\
+Y(\q{\ve r}, \q{\ve s}) &= V(\q{\ve r}, \q{\ve s}) V(\n{\ve r}, \n{\ve s})^{-1} \n{\ve y}.
+\end{aligned}
+\end{equation}
+%
+I am tinkering with good notations for the interpolation operator.  One idea is
+%
+\begin{equation}
+\n{I}(\ve r, \ve s) = V(\ve r, \ve s) V(\n{\ve r}, \n{\ve s})^{-1}
+\end{equation}
+%
+meaning an operator interpolating values on nodes to $\ve r, \ve s$.  The overset $n$ is the only way to infer the number of columns, or that the domain of $\n{I}$ is values on nodes.
+
+

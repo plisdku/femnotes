@@ -1,0 +1,65 @@
+\chapter{FEM Equations}
+\label{chap:fem}
+
+With all that preliminary stuff taken care of let's get to the thing we really want, the Poisson FEM equations (weak form) in a single element and in the whole space.
+
+\section{Poisson Equation}
+
+And here it is.
+%
+\begin{equation}
+\begin{aligned}
+\nabla^2 \phi &= f \qquad &&\textrm{in $\Omega$} \\
+\phi &= \phi_d \qquad &&\textrm{on $\partial \Omega_d$} \\
+\partial_n \phi &= e_n \qquad &&\textrm{on $\partial \Omega_n$.}
+\end{aligned}
+\end{equation}
+%
+Put it in weak form by left-multiplying by a test function $\psi$ and integrating:
+%
+\begin{equation}
+\begin{aligned}
+\int_\Omega \psi \nabla^2 \phi &= \int_\Omega \psi f \\
+&= \int_{\partial \Omega_n} e_n - \int_\Omega \nabla \psi \cdot \nabla \phi.
+\end{aligned}
+\end{equation}
+%
+then keeping only terms with $\phi$ on the left.  Together with the Dirichlet boundary condition this is the weak form Poisson equation:
+%
+\begin{equation}
+\boxed{
+\begin{aligned}
+- \int_\Omega \nabla \psi \cdot \nabla \phi &= \int_\Omega \psi f - \int_{\partial \Omega} \psi e_n \qquad &&\textrm{in $\Omega$} \\
+\phi &= \phi_d \qquad &&\textrm{on $\partial \Omega_d$}.
+\end{aligned}
+}
+\end{equation}
+
+\section{Discretization}
+
+Discretize the weak form on a single element $\bigtriangleup$ using the operators defined in Chapter \ref{chap:preliminaries}.  Take $\psi$ and $\phi$ to be the vectors of their values on the nodal points.
+%
+\begin{equation}
+- \psi^T \left[ D_x^T Q \diag |J| D_x + D_y^T Q \diag |J| D_y \right] \phi = \psi^T Q |J| f - \sum_\textrm{Neumann edges} \psi^T L_\textrm{edge}^T Q^\textrm{1d}  \diag| J^\textrm{1d}| e_n.
+\end{equation}
+%
+The function of the ``lift operator'' $L^\textrm{1d}$ is to extract the nodal values from one edge of $\bigtriangleup$ in turn\footnote{Why the eff do \cite{hesthaven2007nodal} call it the lift operator?}.  It's just a bunch of 1s and 0s in a matrix.  Figure this out, you're up to it.
+
+In the case of a triangle with three Neumann edges, we will have one test function per node.  By usual convention we take the test functions to be Lagrange polynomials, so in their discrete form each test function is a vector with a 1 in only one position and zeros elsewhere.  Arranging the test functions consecutively in order by node we just get an identity matrix, so the elemental system is
+%
+\begin{equation}
+\boxed{
+- \left[ D_x^T Q \diag |J| D_x + D_y^T Q  \diag |J| D_y \right] \phi = Q \diag |J| f - \sum_\textrm{Neumann edges} L_\textrm{edge}^T Q^\textrm{1d} \diag | J^\textrm{1d}| e_n.
+}
+\end{equation}
+%
+To implement Dirichlet boundaries, exclude the rows corresponding to the Dirichlet nodes and constrain those nodal values of $\phi$ to take their fixed values $\phi_d$.  If there are no Neumann nodes then the Neumann terms vanish entirely.
+
+\section{Global system matrix}
+
+Now you need to combine all the elemental matrices into one system matrix.  Once you have a local-to-global map for node indices this is easy enough.
+
+
+
+
+
