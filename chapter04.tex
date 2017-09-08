@@ -45,9 +45,62 @@ Y(\q{\ve r}, \q{\ve s}) &= V(\q{\ve r}, \q{\ve s}) V(\n{\ve r}, \n{\ve s})^{-1} 
 I am tinkering with good notations for the interpolation operator.  How is this:
 %
 \begin{equation}
+\boxed{
 I(\ve r, \ve s) = V(\ve r, \ve s) V(\n{\ve r}, \n{\ve s})^{-1}
+}% boxed
 \end{equation}
 %
 meaning an operator interpolating values on nodes to $\ve r, \ve s$.  Differentiation in the reference simplex is accomplished by the operators $D_r = \partial_r I$ and $D_s = \partial_s I$.  Also $I(\n{\ve r}, \n{\ve s}) \equiv \mathbb{1}$.
+
+The forward coordinate transformation is an interpolation.
+%
+\begin{equation}
+\boxed{
+\begin{aligned}
+X(\q{\ve r}, \q{\ve s}) &= I(\q{\ve r}, \q{\ve s}) \n{\ve x} \\
+Y(\q{\ve r}, \q{\ve s}) &= I(\q{\ve r}, \q{\ve s}) \n{\ve y}.
+\end{aligned}
+}%boxed
+\end{equation}
+%
+The Jacobian of the forward transformation is
+%
+\begin{equation}
+J(\q r, \q s) =
+\begin{bmatrix}
+\partial_r X(\q r, \q s) & \partial_s X(\q r, \q s) \\
+\partial_r Y(\q r, \q s) & \partial_s Y(\q r, \q s)
+\end{bmatrix}
+=
+\begin{bmatrix}
+\partial_r I(\q r, \q s) \n{\ve x} & \partial_s I(\q r, \q s) \n{\ve x} \\
+\partial_r I(\q r, \q s) \n{\ve y} & \partial_s I(\q r, \q s) \n{\ve y}
+\end{bmatrix}
+\end{equation}
+
+\subsection{Inverse coordinate transform}
+
+To evaluate $R(x,y)$ and $S(x,y)$ numerically, how about Newton's method?  Start with a linear guess---or any guess inside the simplex probably---and iterate:
+%
+\begin{equation}
+\begin{bmatrix} r_{n+1} \\ s_{n+1} \end{bmatrix}
+=
+\begin{bmatrix} r_n \\ s_n \end{bmatrix}
+-
+J(r_n, s_n)^{-1}
+%\begin{bmatrix} \partial_r X(r_n, s_n) & \partial_s X(r_n, s_n) \\ \partial_r Y(r_n, s_n) & \partial_s Y(r_n, s_n) \end{bmatrix}^{-1}
+\begin{bmatrix}X(r_n, s_n) - x \\ Y(r_n, s_n) - y \end{bmatrix}.
+\end{equation}
+%
+My gut feeling is that this will converge to the correct $(r,s)$ for any initial guess inside the simplex, as long as the element is not inverted.
+
+
+
+
+
+
+
+
+
 
 
