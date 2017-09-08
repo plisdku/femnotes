@@ -39,13 +39,15 @@ X(\q{\ve r}, \q{\ve s}) &= V(\q{\ve r}, \q{\ve s}) V(\n{\ve r}, \n{\ve s})^{-1} 
 Y(\q{\ve r}, \q{\ve s}) &= V(\q{\ve r}, \q{\ve s}) V(\n{\ve r}, \n{\ve s})^{-1} \n{\ve y}.
 \end{aligned}
 \end{equation}
-%
-I am tinkering with good notations for the interpolation operator.  One idea is
+
+\subsection{Interpolation}
+
+I am tinkering with good notations for the interpolation operator.  How is this:
 %
 \begin{equation}
-\n{I}(\ve r, \ve s) = V(\ve r, \ve s) V(\n{\ve r}, \n{\ve s})^{-1}
+I(\ve r, \ve s) = V(\ve r, \ve s) V(\n{\ve r}, \n{\ve s})^{-1}
 \end{equation}
 %
-meaning an operator interpolating values on nodes to $\ve r, \ve s$.  The overset $n$ is the only way to infer the number of columns, or that the domain of $\n{I}$ is values on nodes.
+meaning an operator interpolating values on nodes to $\ve r, \ve s$.  Differentiation in the reference simplex is accomplished by the operators $D_r = \partial_r I$ and $D_s = \partial_s I$.  Also $I(\n{\ve r}, \n{\ve s}) \equiv \mathbb{1}$.
 
 
