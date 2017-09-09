@@ -64,6 +64,7 @@ Y(\q{\ve r}, \q{\ve s}) &= I(\q{\ve r}, \q{\ve s}) \n{\ve y}.
 \end{equation}
 
 \subsection{Jacobian}
+\label{sec:curvilinear_jacobian}
 
 The Jacobian of the forward transformation is
 %
@@ -197,6 +198,18 @@ The quadrature matrix in $xy$ space is
 \begin{equation}
 Q \equiv I_{f \rightarrow q}^T V_q^{-T} V_q^{-1} \operatorname{diag}\{| \q{\ve J}|\} I_{f \rightarrow q}.
 \end{equation}
+
+For sensitivity analyses later I will differentiate $Q$ with respect to $\g{\ve x}$ and $\g{\ve y}$.  God save me, I will see it through!
+
+\section{Differentiation}
+
+The differentiation operator has already shown its ugly mug in subsection \ref{sec:curvilinear_jacobian}.  It has become easy.  For instance on field nodes,
+%
+\begin{equation}
+\f{D}_r(\ve r, \ve s) = \partial_r I_f(\ve r, \ve s) = \partial_r V_f(\ve r, \ve s) V_f^{-1}.
+\end{equation}
+%
+Differentiation in $xy$ space uses the pointwise Jacobian.  I wrote that formula out before.
 
 
 
