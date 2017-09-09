@@ -62,7 +62,9 @@ Y(\q{\ve r}, \q{\ve s}) &= I(\q{\ve r}, \q{\ve s}) \n{\ve y}.
 \end{aligned}
 }%boxed
 \end{equation}
-%
+
+\subsection{Jacobian}
+
 The Jacobian of the forward transformation is
 %
 \begin{equation}
@@ -83,6 +85,7 @@ J(\q r, \q s) =
 To evaluate $R(x,y)$ and $S(x,y)$ numerically, how about Newton's method?  Start with a linear guess---or any guess inside the simplex probably---and iterate:
 %
 \begin{equation}
+\boxed{
 \begin{bmatrix} r_{n+1} \\ s_{n+1} \end{bmatrix}
 =
 \begin{bmatrix} r_n \\ s_n \end{bmatrix}
@@ -90,17 +93,110 @@ To evaluate $R(x,y)$ and $S(x,y)$ numerically, how about Newton's method?  Start
 J(r_n, s_n)^{-1}
 %\begin{bmatrix} \partial_r X(r_n, s_n) & \partial_s X(r_n, s_n) \\ \partial_r Y(r_n, s_n) & \partial_s Y(r_n, s_n) \end{bmatrix}^{-1}
 \begin{bmatrix}X(r_n, s_n) - x \\ Y(r_n, s_n) - y \end{bmatrix}.
+}%boxed
 \end{equation}
 %
 My gut feeling is that this will converge to the correct $(r,s)$ for any initial guess inside the simplex, as long as the element is not inverted.
 
+\section{Nodal sets}
 
+Following \cite{hesthaven2007nodal}, the order of an element is specified by the number of elements $N$ along one of its edges, including vertex nodes.  Nodal coordinates $\ve r, \ve s$ are given by the warping recipe from \cite{hesthaven2007nodal}.  For now I'll assume that an element has the same number of nodes along each of its edges.
 
+There are three nodal sets of interest.
+%
+\begin{enumerate}
+  \item $\f{\ve r}, \f{\ve s}$: the $field$ nodes where the solution (\emph{e.g.} electrostatic potential) is defined, with $N_f$ samples on each element edge,
+  \item $\g{\ve r}, \g{\ve s}$: the \emph{geometry} nodes where the nodal positions $\g{\ve x}, \g{\ve y}$ are specified, with $N_g$ samples per edge,
+  \item $\q{\ve r}, \q{\ve s}$: the \emph{quadrature} nodes where functions are sampled for numerical integration, with $N_q$ samples per edge.
+\end{enumerate}
+%
+Isoparametric formulations of FEM will have $N_f = N_g$.  I've read that low-order quadrature formulae work ok as long as the elements are affine ($N_g = 2$) but higher-order curvilinear quadrature needs more samples.  So I think I will have a set of quadrature nodes with $N_q > N_f, N_g$.
 
+\section{Vandermonde matrices}
 
+Vandermonde matrices are always defined on the reference element, independent of whether the mesh is curvilinear or just affine.  A nodal set of order $N$ has $\frac{N(N+1)}{2}$ nodes and $\frac{N(N+1)}{2}$ orthonormal basis polynomials.  An element of order $N+1$ shares the first $\frac{N(N+1)}{2}$ basis polynomials with an element of order $N$, and adds on a few more with higher polynomial order.  There is a name for this property of the basis functions and some FEM formulations do not have this (useful) feature.
 
+A Vandermonde matrix maps modal coefficients to nodal values.  Its general form for $n$ nodes and $m$ basis polynomials is
+%
+\begin{equation}
+V(\ve r, \ve s) =
+\begin{bmatrix}
+\phi_1(r_1, s_1) & \phi_2(r_1, s_1) & \cdots & \phi_m(r_1, s_1) \\
+\phi_1(r_2, s_2) & \phi_2(r_2, s_2) & \cdots & \phi_m(r_2, s_2) \\
+\vdots & \vdots & \ddots & \vdots \\
+\phi_1(r_n, s_n) & \phi_2(r_n, s_n) & \cdots & \phi_m(r_n, s_n)
+\end{bmatrix}.
+\end{equation}
+%
+Several Vandermonde matrices will be of interest for curvilinear FEM.
+%
+\begin{enumerate}
+  \item $V_f(\ve r, \ve s)$ evaluates modes 1 through $\frac{N_f(N_f+1)}{2}$ on points $\ve r, \ve s$.  The symbol $V_f$ alone will refer to the square matrix $V_f(\f{\ve r}, \f{\ve s})$, the usual Vandermonde matrix of the previous chapters.
+  \item $V_g(\ve r, \ve s)$ evaluates modes 1 through $\frac{N_g(N_g+1)}{2}$ on points $\ve r, \ve s$.  The symbol $V_g$ alone means the square matrix $V_g(\g{\ve r}, \g{\ve s})$.
+  \item $V_q(\ve r, \ve s)$ evaluates modes 1 through $\frac{N_q(N_q+1)}{2}$ on points $\ve r, \ve s$.  The symbol $V_q$ alone means the square matrix $V_q(\q{\ve r}, \q{\ve s})$.  This should be the biggest matrix since we need lots of quadrature points.
+\end{enumerate}
+%
+Furthermore the shorthand notations $V_{f \rightarrow g} \equiv V_f(\g{\ve r}, \g{\ve s})$ and other similar symbols might be used from time to time.
 
+\subsection{Notations for interpolation}
 
+Here is some similar shorthand for interpolation.
+%
+\begin{enumerate}
+  \item $I_f(\ve r, \ve s) \equiv V_f(\ve r, \ve s) V_f^{-1}$, and similarly $I_g(\ve r, \ve s)$ and $I_q(\ve r, \ve s)$, interpolating certain nodal values to arbitrary coordinates
+  \item $I_{f \rightarrow g} \equiv V_{f \rightarrow g} V_f^{-1}$ and other such symbols, interpolating values on one nodal set to another nodal set.
+\end{enumerate}
+
+\subsection{Cautionary note for quadrature}
+
+What is the best approach for mapping field nodal values to quadrature modal coefficients?  This is a bad case because the higher-order quadrature modes will become linearly dependent with lower-order modes when evaluated on a smaller set of field nodes.  The simplest calculation of quadrature modal coefficients is
+%
+\begin{equation}
+\q{\hat u} = V_{q \rightarrow f}^+ \f{\ve u}.
+\end{equation}
+%
+I haven't tested this but I suspect it will populate higher order modes even if the field nodes can only resolve quadratics.  We can force it to do better:
+%
+\begin{equation}
+\q{\hat u} = V_q^{-1} V_{f \rightarrow q} V_f^{-1} \f{\ve u} = V_q^{-1} I_{f \rightarrow q} \f{\ve u}.
+\end{equation}
+%
+If the field nodes only resolve quadratics, this will smoothly evaluate a quadratic at finely-spaced quadrature points, then correctly produce the quadratic coefficients and zero-out the cubic and higher order coefficients.
+
+\section{Quadrature}
+
+Although quadrature can be performed on any nodal set let's assume I will use high-density quadrature nodes whenever curvilinear elements are involved.  In the reference simplex\footnote{My notation is looking more and more ridiculous.},
+%
+\begin{equation}
+\int_\bigtriangleup dr\, ds\, f(r,s) g(r,s) = \q{\ve f^T} V_q^{-T} V_q^{-1} \q{\ve g}.
+\end{equation}
+%
+In $xy$ space we need the determinant of the Jacobian.  First obtain the pointwise Jacobian at all quadrature nodes.
+%
+\begin{equation}
+J(\q{\ve r}, \q{\ve s}) =
+\begin{bmatrix}
+\partial_r I_{g \rightarrow q} \g{\ve x} & \partial_s I_{g \rightarrow q} \g{\ve x} \\
+\partial_r I_{g \rightarrow q} \g{\ve y} & \partial_s I_{g \rightarrow q} \g{\ve y}
+\end{bmatrix}
+\end{equation}
+%
+Then the pointwise determinant can be denoted $| \q{\ve{J}} |$.  Combine it with the quadrature kernel as a diagonal matrix.  Now we can integrate in $xy$ space:
+%
+\begin{equation}
+\begin{aligned}
+\int_\bigtriangleup dx \, dy \, f(x,y) g(x,y) &= \int_\bigtriangleup dr \, ds \, |J| f(r,s) g(r,s) \\
+&= \q{\ve f^T} V_q^{-T} V_q^{-1} \operatorname{diag}\{| \q{\ve J}|\} \q{\ve g} \\
+&= \f{\ve f^T} I_{f \rightarrow q}^T V_q^{-T} V_q^{-1} \operatorname{diag}\{| \q{\ve J}|\} I_{f \rightarrow q} \f{\ve g}.
+\end{aligned}
+\end{equation}
+%
+In the last line I've assumed the usual situation where $f$ and $g$ are known only at field nodes and need to be interpolated to quadrature points.
+
+The quadrature matrix in $xy$ space is
+\begin{equation}
+Q \equiv I_{f \rightarrow q}^T V_q^{-T} V_q^{-1} \operatorname{diag}\{| \q{\ve J}|\} I_{f \rightarrow q}.
+\end{equation}
 
 
 
