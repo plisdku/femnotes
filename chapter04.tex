@@ -31,12 +31,12 @@ R(x, y) \\ S(x,y)
 %
 When $X$ and $Y$ are polynomial functions of $r$ and $s$, $R$ and $S$ are not in general polynomials.  (Consider $X(r) = r^2$ and its non-polynomial inverse mapping $R(x) = \sqrt{x}$.)  I think we'll have to invert them numerically with \emph{e.g.} Newton's method.
 
-Define the coordinate transformations using nodal polynomials by the usual scheme.  Within a single element let the nodal coordinates in the reference simplex be $\n{\ve r}, \n{\ve s}$ which map to $\n{\ve x}, \n{\ve y}$.  Then to evaluate at query points $\q{\ve r}, \q{\ve s}$ use interpolation,
+Define the coordinate transformations using nodal polynomials by the usual scheme.  Within a single element let the nodal coordinates in the reference simplex be $\g{\ve r}, \g{\ve s}$ which map to $\g{\ve x}, \g{\ve y}$.  Then to evaluate at query points $\q{\ve r}, \q{\ve s}$ use interpolation,
 %
 \begin{equation}
 \begin{aligned}
-X(\q{\ve r}, \q{\ve s}) &= V(\q{\ve r}, \q{\ve s}) V(\n{\ve r}, \n{\ve s})^{-1} \n{\ve x} \\
-Y(\q{\ve r}, \q{\ve s}) &= V(\q{\ve r}, \q{\ve s}) V(\n{\ve r}, \n{\ve s})^{-1} \n{\ve y}.
+X(\q{\ve r}, \q{\ve s}) &= V(\q{\ve r}, \q{\ve s}) V(\g{\ve r}, \g{\ve s})^{-1} \g{\ve x} \\
+Y(\q{\ve r}, \q{\ve s}) &= V(\q{\ve r}, \q{\ve s}) V(\g{\ve r}, \g{\ve s})^{-1} \g{\ve y}.
 \end{aligned}
 \end{equation}
 
@@ -46,19 +46,19 @@ I am tinkering with good notations for the interpolation operator.  How is this:
 %
 \begin{equation}
 \boxed{
-I(\ve r, \ve s) = V(\ve r, \ve s) V(\n{\ve r}, \n{\ve s})^{-1}
+I(\ve r, \ve s) = V(\ve r, \ve s) V(\g{\ve r}, \g{\ve s})^{-1}
 }% boxed
 \end{equation}
 %
-meaning an operator interpolating values on nodes to $\ve r, \ve s$.  Differentiation in the reference simplex is accomplished by the operators $D_r = \partial_r I$ and $D_s = \partial_s I$.  Also $I(\n{\ve r}, \n{\ve s}) \equiv \mathbb{1}$.
+meaning an operator interpolating values on nodes to $\ve r, \ve s$.  Differentiation in the reference simplex is accomplished by the operators $D_r = \partial_r I$ and $D_s = \partial_s I$.  Also $I(\g{\ve r}, \g{\ve s}) \equiv \mathbb{1}$.
 
 The forward coordinate transformation is an interpolation.
 %
 \begin{equation}
 \boxed{
 \begin{aligned}
-X(\q{\ve r}, \q{\ve s}) &= I(\q{\ve r}, \q{\ve s}) \n{\ve x} \\
-Y(\q{\ve r}, \q{\ve s}) &= I(\q{\ve r}, \q{\ve s}) \n{\ve y}.
+X(\ve r, \ve s) &= I(\ve r, \ve s) \g{\ve x} \\
+Y(\ve r, \ve s) &= I(\ve r, \ve s) \g{\ve y}.
 \end{aligned}
 }%boxed
 \end{equation}
@@ -69,17 +69,29 @@ Y(\q{\ve r}, \q{\ve s}) &= I(\q{\ve r}, \q{\ve s}) \n{\ve y}.
 The Jacobian of the forward transformation is
 %
 \begin{equation}
-J(\q r, \q s) =
+J(r, s) =
 \begin{bmatrix}
-\partial_r X(\q r, \q s) & \partial_s X(\q r, \q s) \\
-\partial_r Y(\q r, \q s) & \partial_s Y(\q r, \q s)
+\partial_r X(r, s) & \partial_s X(r, s) \\
+\partial_r Y(r, s) & \partial_s Y(r, s)
 \end{bmatrix}
 =
 \begin{bmatrix}
-\partial_r I(\q r, \q s) \n{\ve x} & \partial_s I(\q r, \q s) \n{\ve x} \\
-\partial_r I(\q r, \q s) \n{\ve y} & \partial_s I(\q r, \q s) \n{\ve y}
+\partial_r I(r, s) \g{\ve x} & \partial_s I(r, s) \g{\ve x} \\
+\partial_r I(r, s) \g{\ve y} & \partial_s I(r, s) \g{\ve y}
 \end{bmatrix}
 \end{equation}
+%
+I haven't defined the differentiation operators yet but it turns out that
+%
+\begin{equation}
+J(\ve r, \ve s) =
+\begin{bmatrix}
+\g{D_r}(\ve r, \ve s) \g{\ve x} & \g{D_s}(\ve r, \ve s) \g{\ve x} \\
+\g{D_r}(\ve r, \ve s) \g{\ve y} & \g{D_s}(\ve r, \ve s) \g{\ve y}
+\end{bmatrix}.
+\end{equation}
+%
+Pleasingly literal right?
 
 \subsection{Inverse coordinate transform}
 
@@ -299,10 +311,47 @@ It follows that
 }%boxed
 \end{equation}
 
+\subsection{Jacobian sensitivity}
 
+Blockwise,
+%
+\begin{equation}
+\pp{}{\g{\ve x}} J(\ve r, \ve s) = 
+\begin{bmatrix}
+\g{D_r}(\ve r, \ve s) & \g{D_s}(\ve r, \ve s)
+\\ \mathbb{0} & \mathbb{0}
+\end{bmatrix}
+\end{equation}
+%
+although properly this thing is a three-dimensional tensor and I would do better to calculate its matrix elements one at a time,
+%
+\begin{equation}
+\begin{aligned}
+\pp{j_{11}}{\g{\ve x}}(\ve r, \ve s) &= \g{D_r}(\ve r, \ve s) &\pp{j_{12}}{\g{\ve x}}(\ve r, \ve s) &= \g{D_s}(\ve r, \ve s) \\
+\pp{j_{21}}{\g{\ve x}}(\ve r, \ve s) &= \mathbb{0} &\pp{j_{22}}{\g{\ve x}}(\ve r, \ve s) &= \mathbb{0}
+\end{aligned}
+\end{equation}
+%
+and for $\g{\ve y}$,
+%
+\begin{equation}
+\begin{aligned}
+\pp{j_{11}}{\g{\ve y}}(\ve r, \ve s) &= \mathbb{0} &\pp{j_{12}}{\g{\ve y}}(\ve r, \ve s) &= \mathbb{0} \\
+\pp{j_{21}}{\g{\ve y}}(\ve r, \ve s) &= \g{D_r}(\ve r, \ve s) &\pp{j_{22}}{\g{\ve y}}(\ve r, \ve s) &= \g{D_s}(\ve r, \ve s).
+\end{aligned}
+\end{equation}
+%
+I am not enthused about trying to wrap this all up in tensor notation at the moment.  The upgrade to three dimensions might change my mind on that.
 
+\subsection{Inverse Jacobian sensitivity}
 
-
+Work pointwise, one parameter at a time, \emph{e.g.}
+%
+\begin{equation}
+\pp{K}{\g{x_i}} = - K \pp{J}{\g{x_i}} K.
+\end{equation}
+%
+This will be vile any way you look at it.  Differentiating $K$ with respect to elements of $J$ (Equation \ref{eqn:jacobian_jacobian_sensitivity}) might still be a nice intermediate step.  I have my doubts.
 
 
 
