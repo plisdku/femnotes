@@ -195,21 +195,118 @@ Then the pointwise determinant can be denoted $| \q{\ve{J}} |$.  Combine it with
 In the last line I've assumed the usual situation where $f$ and $g$ are known only at field nodes and need to be interpolated to quadrature points.
 
 The quadrature matrix in $xy$ space is
+%
 \begin{equation}
+\boxed{
 Q \equiv I_{f \rightarrow q}^T V_q^{-T} V_q^{-1} \operatorname{diag}\{| \q{\ve J}|\} I_{f \rightarrow q}.
+}%boxed
 \end{equation}
 
 For sensitivity analyses later I will differentiate $Q$ with respect to $\g{\ve x}$ and $\g{\ve y}$.  God save me, I will see it through!
 
 \section{Differentiation}
 
-The differentiation operator has already shown its ugly mug in subsection \ref{sec:curvilinear_jacobian}.  It has become easy.  For instance on field nodes,
+The differentiation operator has already shown its ugly mug in subsection \ref{sec:curvilinear_jacobian}.  It has become easy.  For instance on field nodes, the partial derivative with respect to $r$ obtained by
 %
 \begin{equation}
 \f{D}_r(\ve r, \ve s) = \partial_r I_f(\ve r, \ve s) = \partial_r V_f(\ve r, \ve s) V_f^{-1}.
 \end{equation}
 %
-Differentiation in $xy$ space uses the pointwise Jacobian.  I wrote that formula out before.
+Differentiation in $xy$ space uses the pointwise Jacobian.  I wrote that formula out before in Chapter \ref{chap:preliminaries} but I can update the notation now.
+
+By the chain rule, $\nabla_{rs} f = (\nabla_{xy}f)J$, so $\nabla_{xy}f = (\nabla_{rs} f) J^{-1}$.  Let's write out the terms and discretize everything.  Let the inverse Jacobian be $K(r,s)$:
+%
+\begin{equation}
+K(r,s) = J(r,s)^{-1} = \begin{bmatrix}
+k_{11}(r,s) & k_{12}(r,s) & \hdots \\
+k_{21}(r,s) & k_{22}(r,s) & \hdots \\
+\vdots & \vdots & \ddots
+\end{bmatrix}.
+\end{equation}
+%
+Then the partial derivative operators are
+%
+\begin{equation}
+\begin{aligned}
+\partial_x = k_{11}(r,s) \partial_r + k_{21}(r,s) \partial_s \\
+\partial_y = k_{12}(r,s) \partial_r + k_{22}(r,s) \partial_s.
+\end{aligned}
+\end{equation}
+%
+We will calculate $rs$ gradients in single elements using the differentiation matrices and linearly combine them pointwise to obtain $xy$ gradients.
+%
+\begin{equation}
+\boxed{
+\begin{aligned}
+D_x &= \mathrm{diag}(\ve k_{11}) D_r + \mathrm{diag}(\ve k_{21}) D_s \\
+D_y &= \mathrm{diag}(\ve k_{12}) D_r + \mathrm{diag}(\ve k_{22}) D_s .
+\end{aligned}
+}
+%\label{eqn:partialDerivatives}
+\end{equation}
+
+\section{Sensitivity to nodal perturbations}
+
+A shape sensitivity is a derivative with respect to geometry node coordinates, $\partial/\partial \g{\ve x}$ or $\partial/\partial \g{\ve y}$.  Basically every quantity and operation of interest in curvilinear FEM must be differentiated with respect to nodal coordinates in order to obtain the shape sensitivity of some objective function of the fields.  All shape dependence comes from the coordinate transformations $X(r,s)$ and $Y(r,s)$ and their shape sensitivities.
+
+\subsection{Coordinate transformation sensitivity}
+The shape sensitivities of the forward coordinate transformation turn out to be the interpolation matrices, for instance:
+%
+\begin{equation}
+\pp{}{\g{\ve x}}X(r,s) = \pp{}{\g{\ve x}}I_g(r,s) \g{\ve x} = I_g(r,s) \mathbb{1} = I_g(r,s).
+\end{equation}
+%
+The sensitivities of $X(\ve r, \ve s)$ and $Y(\ve r, \ve s)$ together to $\g{\ve x}$ and $\g{\ve y}$ are
+%
+\begin{equation}
+\boxed{
+\begin{bmatrix}
+\pp{X(\ve r,\ve s)}{\g{\ve x}} & \pp{X(\ve r,\ve s)}{\g{\ve y}} \\
+\pp{Y(\ve r,\ve s)}{\g{\ve x}} & \pp{Y(\ve r,\ve s)}{\g{\ve y}}
+\end{bmatrix}
+=
+\begin{bmatrix}
+I_g(\ve r,\ve s) & \mathbb{0} \\
+\mathbb{0} & I_g(\ve r,\ve s)
+\end{bmatrix}.
+}%boxed
+\end{equation}
+
+The sensitivity of the inverse transforms $R(x,y)$ and $S(x,y)$ to arbitrary parameter changes were derived before (Equation \ref{eqn:inverse_transformation_derivative}).  In the new-style notation, for a single point $(r,s) = (R(x,y), S(x,y))$,
+%
+\begin{equation}
+\begin{bmatrix} \pp{R(x,y)}{p} \\ \pp{S(x,y)}{p} \end{bmatrix}
+=
+-K(r,s)
+\begin{bmatrix}
+\pp{X(r,s)}{p} \\ \pp{Y(r,s)}{p}
+\end{bmatrix}.
+\end{equation}
+%
+It follows that
+%
+\begin{equation}
+\boxed{
+\begin{bmatrix}
+\pp{R(\ve x,\ve y)}{\g{\ve x}} & \pp{R(\ve x,\ve y)}{\g{\ve y}} \\
+\pp{S(\ve x,\ve y)}{\g{\ve x}} & \pp{S(\ve y,\ve y)}{\g{\ve y}}
+\end{bmatrix}
+=
+-\begin{bmatrix}
+\operatorname{diag}(\ve{k}_{11}) I_g(\ve r, \ve s) & \operatorname{diag}(\ve{k}_{12}) I_g(\ve r, \ve s) \\
+\operatorname{diag}(\ve{k}_{21}) I_g(\ve r, \ve s) & \operatorname{diag}(\ve{k}_{22}) I_g(\ve r, \ve s)
+\end{bmatrix}.
+}%boxed
+\end{equation}
+
+
+
+
+
+
+
+
+
 
 
 
