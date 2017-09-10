@@ -298,6 +298,7 @@ The sensitivity of the inverse transforms $R(x,y)$ and $S(x,y)$ to arbitrary par
 It follows that
 %
 \begin{equation}
+\label{eqn:rs_sensitivity}
 \boxed{
 \begin{bmatrix}
 \pp{R(\ve x,\ve y)}{\g{\ve x}} & \pp{R(\ve x,\ve y)}{\g{\ve y}} \\
@@ -341,7 +342,7 @@ and for $\g{\ve y}$,
 \end{aligned}
 \end{equation}
 %
-I am not enthused about trying to wrap this all up in tensor notation at the moment.  The upgrade to three dimensions might change my mind on that.
+I am not enthused about trying to wrap this all up in tensor notation at the moment.  The upgrade to three dimensions might change my mind on that.  Perhaps I could use two tensors, $\ppp{J}{\g{\ve x}}$ and $\ppp{J}{\g{\ve y}}$, both in $\mathbb{R}^{2 \times 2 \times \frac{1}{2}N_g(N_g+1)}$.  That's not too bad.
 
 \subsection{Inverse Jacobian sensitivity}
 
@@ -351,7 +352,73 @@ Work pointwise, one parameter at a time, \emph{e.g.}
 \pp{K}{\g{x_i}} = - K \pp{J}{\g{x_i}} K.
 \end{equation}
 %
-This will be vile any way you look at it.  Differentiating $K$ with respect to elements of $J$ (Equation \ref{eqn:jacobian_jacobian_sensitivity}) might still be a nice intermediate step.  I have my doubts.
+This will be vile any way you look at it.  Differentiating $K$ with respect to elements of $J$ (Equation \ref{eqn:jacobian_jacobian_sensitivity}) might still be a nice intermediate step.  I have my doubts.  In practice I would probably calculate two tensor variables $\ppp{K}{\g{\ve x}}$ and $\ppp{K}{\g{\ve y}}$ in $\mathbb{R}^{2 \times 2 \times \frac{1}{2}N_g(N_g+1)}$.
+
+\subsection{Jacobian determinant sensitivity}
+
+No room for improvement on Equation \ref{eqn:jacobian_determinant_sensitivity}, which was
+%
+\begin{equation}
+\pp{}{p} |J(r,s)| = |J(r,s)| \operatorname{Tr} \left( J(r,s)^{-1} \pp{J(r,s)}{p} \right).
+\end{equation}
+%
+If it comes in handy, note that $\operatorname{Tr}(AB) = A^T : B$ (matrix dot matrix, a scalar).
+
+\subsection{Gradient matrix sensitivity}
+
+The $rs$ gradient matrices $D_r$ and $D_s$ are insensitive to the geometry of course.  The sensitivity of $D_x$ and $D_y$ comes from the inverse Jacobian.  This follows the prescription of Equation \ref{eqn:partialDerivativeSensitivities}:
+%
+\begin{equation}
+\begin{aligned}
+\pp{D_x}{p} &= \diag \left( \pp{\ve k_{11}}{p} \right) D_r + \diag \left( \pp{\ve k_{21}}{p} \right) D_s \\
+\pp{D_y}{p} &= \diag \left( \pp{\ve k_{12}}{p} \right) D_r + \diag \left( \pp{\ve k_{22}}{p} \right) D_s. \\
+\end{aligned}
+\end{equation}
+
+\subsection{Interpolation sensitivity}
+
+We evaluate a function $u(\ve x, \ve y)$ using interpolation:
+%
+\begin{equation}
+u(\ve x, \ve y) = I_f(R(\ve x, \ve y), S(\ve x, \ve y)) u(\f{\ve r}, \f{\ve s}).
+\end{equation}
+%
+We want to calculate $\ppp{u}{\g{\ve x}}$ and $\ppp{u}{\g{\ve y}}$.  These sensitivities reflect the change of $u$ as the mesh shifts under the measurement point.  We abbreviate $\ve r = R(\ve x, \ve y)$ and $\ve s = S(\ve x, \ve y)$ with the understanding that $\ve x$ and $\ve y$ are the independent variables.  This is a three-dimensional tensorial derivative because it has indices for the query points $x_i, y_i$, the field samples $u_j$ located on $\f{\ve r}, \f{\ve s}$, and the geometry nodal coordinates $\g{x}_k, \g{y}_k$.
+%
+\begin{equation}
+\pp{}{\g{x}_k} I_f(r_i, s_i)_j = \f{D}_r(r_i, s_i)_j \pp{R}{\g{x}_k}(x_i, y_i) + \f{D}_s(r_i, s_i) \pp{S}{\g{x}_k}(x_i, y_i).
+\end{equation}
+%
+(\emph{N.B.}: the repeated $i$ index is not contracted in this expression.)  The sensitivities of $R$ and $S$ are calculated a bit earlier (Equation \ref{eqn:rs_sensitivity}), \emph{e.g.}
+%
+\begin{equation}
+\pp{R}{\g{x}_k} = -k_{11}(r_i, s_i) I_g(r_i, s_i)_k,
+\end{equation}
+%
+also without index contraction over $i$.  Sanity check: the right number of indices comes out,
+%
+\begin{equation}
+\pp{}{\g{x}_k}u(x_i, y_i) = \pp{}{\g{x}_k} I_f(r_i, s_i)_j u_j
+\end{equation}
+%
+with index contraction of $j$.
+
+
+\subsection{Quadrature sensitivity}
+
+Here it is...
+%
+\begin{equation}
+\pp{Q}{p} = I_{f \rightarrow q}^T V_q^{-T} V_q^{-1} \operatorname{diag} \left(  \pp{| \q{\ve J} |}{p} \right) I_{f \rightarrow q}.
+\end{equation}
+%
+This Jacobian is evaluated at quadrature nodes $\q{r}, \q{s}$.  So for instance one of its matrix elements is
+%
+\begin{equation}
+\pp{j_{11}}{\g{\ve x}}(\q{\ve r}, \q{\ve s}) = \g{D}_r(\q{\ve r}, \q{\ve s}) \in \mathbb{R}^{\frac{1}{2}N_q(N_q+1) \times \frac{1}{2}N_g(N_g+1)}.
+\end{equation}
+
+
 
 
 

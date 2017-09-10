@@ -246,6 +246,7 @@ Its sensitivity to changes in single elements of $J$ is
 Frequently we will also need the sensitivity of the Jacobian's determinant, which is
 %
 \begin{equation}
+\label{eqn:jacobian_determinant_sensitivity}
 \boxed{
 \pp{}{p} |J| = |J| \operatorname{Tr} \left( J^{-1} \pp{J}{p} \right).
 }
@@ -280,13 +281,13 @@ I did check this numerically for $2 \times 2$ matrices, O skeptic.
 Knowing $\ppp{J^{-1}}{p}$ we can directly get the sensitivities of $D_x$ and $D_y$ by differentiating Equation \ref{eqn:partialDerivatives},
 %
 \begin{equation}
+\label{eqn:partialDerivativeSensitivities}
 \boxed{
 \begin{aligned}
 \pp{D_x}{p} &= \diag \left( \pp{\ve k_{11}}{p} \right) D_r + \diag \left( \pp{\ve k_{21}}{p} \right) D_s \\
 \pp{D_y}{p} &= \diag \left( \pp{\ve k_{12}}{p} \right) D_r + \diag \left( \pp{\ve k_{22}}{p} \right) D_s. \\
 \end{aligned}
-}
-\label{eqn:partialDerivativeSensitivities}
+}%boxed
 \end{equation}
 %
 Taking the derivative with respect to elements of the Jacobian,
