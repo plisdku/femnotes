@@ -216,6 +216,10 @@ Q \equiv I_{f \rightarrow q}^T V_q^{-T} V_q^{-1} \operatorname{diag}\{| \q{\ve J
 
 For sensitivity analyses later I will differentiate $Q$ with respect to $\g{\ve x}$ and $\g{\ve y}$.  God save me, I will see it through!
 
+\subsection{Edge quadrature}
+
+Same formula but using edge interpolation matrices, edge Vandermonde matrices, and the edge Jacobian determinant.
+
 \section{Differentiation}
 
 The differentiation operator has already shown its ugly mug in subsection \ref{sec:curvilinear_jacobian}.  It has become easy.  For instance on field nodes, the partial derivative with respect to $r$ obtained by
@@ -256,6 +260,7 @@ D_y &= \mathrm{diag}(\ve k_{12}) D_r + \mathrm{diag}(\ve k_{22}) D_s .
 }
 %\label{eqn:partialDerivatives}
 \end{equation}
+
 
 \section{Sensitivity to nodal perturbations}
 
@@ -369,6 +374,7 @@ If it comes in handy, note that $\operatorname{Tr}(AB) = A^T : B$ (matrix dot ma
 The $rs$ gradient matrices $D_r$ and $D_s$ are insensitive to the geometry of course.  The sensitivity of $D_x$ and $D_y$ comes from the inverse Jacobian.  This follows the prescription of Equation \ref{eqn:partialDerivativeSensitivities}:
 %
 \begin{equation}
+\label{eqn:gradient_matrix_sensitivity}
 \begin{aligned}
 \pp{D_x}{p} &= \diag \left( \pp{\ve k_{11}}{p} \right) D_r + \diag \left( \pp{\ve k_{21}}{p} \right) D_s \\
 \pp{D_y}{p} &= \diag \left( \pp{\ve k_{12}}{p} \right) D_r + \diag \left( \pp{\ve k_{22}}{p} \right) D_s. \\
@@ -417,8 +423,6 @@ This Jacobian is evaluated at quadrature nodes $\q{r}, \q{s}$.  So for instance 
 \begin{equation}
 \pp{j_{11}}{\g{\ve x}}(\q{\ve r}, \q{\ve s}) = \g{D}_r(\q{\ve r}, \q{\ve s}) \in \mathbb{R}^{\frac{1}{2}N_q(N_q+1) \times \frac{1}{2}N_g(N_g+1)}.
 \end{equation}
-
-
 
 
 

@@ -43,7 +43,7 @@ Discretize the weak form on a single element $\bigtriangleup$ using the operator
 - \psi^T \left[ D_x^T Q \diag |J| D_x + D_y^T Q \diag |J| D_y \right] \phi = \psi^T Q |J| f - \sum_\textrm{Neumann edges} \psi^T L_\textrm{edge}^T Q^\textrm{1d}  \diag| J^\textrm{1d}| e_n.
 \end{equation}
 %
-The function of the ``lift operator'' $L^\textrm{1d}$ is to extract the nodal values from one edge of $\bigtriangleup$ in turn\footnote{Why the eff do \cite{hesthaven2007nodal} call it the lift operator?}.  It's just a bunch of 1s and 0s in a matrix.  Figure this out, you're up to it.
+The function of $L^\textrm{1d}$ is to extract the nodal values from one edge of $\bigtriangleup$ in turn.  It's just a bunch of 1s and 0s in a matrix.  Figure this out, you're up to it.
 
 In the case of a triangle with three Neumann edges, we will have one test function per node.  By usual convention we take the test functions to be Lagrange polynomials, so in their discrete form each test function is a vector with a 1 in only one position and zeros elsewhere.  Arranging the test functions consecutively in order by node we just get an identity matrix, so the elemental system is
 %

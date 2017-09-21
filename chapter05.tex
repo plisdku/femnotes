@@ -1,0 +1,114 @@
+\chapter{Curvilinear Poisson FEM}
+\label{chap:curvilinear_poisson_fem}
+
+\section{Governing equations and functionals}
+
+Start with the Poisson equation in weak form for a single element.  Solve for $u$; the following holds for all test functions $v$.
+%
+\begin{equation}
+-\int dx\, dy\, \nabla v \cdot \nabla u = \int dx\, dy\, vf - \oint ds\, v e_n.
+\end{equation}
+%
+Discretized using the matrices from the previous chapter, 
+%
+\begin{equation}
+\boxed{
+-\ve{v}^T \left[ \f{D_x^T} \q{Q} \f{D_x^T} + (\f{D_y^T} \q{Q} \f{D_y^T})\right] \ve u
+=
+\ve{v}^T \q{Q} \ve{f} - \sum_\textrm{edges} \ve{v}^T \q{Q}_\textrm{edge} \ve{e}_n.
+}%boxed
+\end{equation}
+
+There are two objective functional types of particular interest to me: pointwise evaluation and integrals.  Pointwise evaluation:
+%
+\begin{equation}
+\boxed{
+f(u(x,y)) = f(I_f(R(x,y), S(x,y)) \ve u).
+}%boxed
+\end{equation}
+%
+Integration of $f(u)$ will be more accurate if $f$ is evaluated on quadrature points.  Throw in a weighting function $a(x,y)$ too.
+%
+\begin{equation}
+\boxed{
+\int dx \, dy \, a(x,y) f(u(x,y)) = a(X(\ve r, \ve s), Y(\ve r, \ve s))^T I_{f \rightarrow q}^T \q{V^{-T}} \q{V^{-1}} \operatorname{diag}(|\q{\ve J}|) f(I_{f \rightarrow q} \ve u).
+}%boxed
+\end{equation}
+%
+We must be careful to use $X$, $Y$, $R$ and $S$ appropriately or else these expressions will not work as expected in sensitivity analysis.
+
+\subsection{Visualization}
+
+Function visualization takes two steps: identify the element enclosing each output point, then interpolate the field within that element.  Let's assume the element has been correctly identified.  Then the evaluation at $\ve x, \ve y$ is
+%
+\begin{equation}
+\boxed{
+u(\ve x, \ve y) = I_f(R(\ve x, \ve y), S(\ve x, \ve y)) \ve u.
+}%boxed
+\end{equation}
+%
+Other functions $f(x,y)$ can be evaluated analytically.
+
+\section{Sensitivity by direct differentiation}
+
+\subsection{Stiffness matrix}
+
+Perturb term by term.
+%
+\begin{equation}
+\partial_p \left[ \f{D_x^T} \q{Q} \f{D_x^T} \right] \ve u = \left[ \partial_p \f{D_x^T} \q{Q} \f{D_x^T} + \f{D_x^T} \partial_p \q{Q} \f{D_x} + \f{D_x^T} \q{Q} \partial_p \f{D_x} \right] \ve u + \left[ \f{D_x^T} \q{Q} \f{D_x^T} \right] \partial_p \ve u.
+\end{equation}
+%
+Unpack $\partial_p \q{Q}$:
+%
+\begin{equation}
+\partial_p \q{Q} = I_{f \rightarrow q}^T \q{V^{-T}} \q{V^{-1}} \operatorname{diag}( \partial_p |\q{\ve J}| ) I_{f \rightarrow q}.
+\end{equation}
+%
+The sensitivity of $\f{D_x}$ was derived before (Equation \ref{eqn:gradient_matrix_sensitivity}) and depends on the sensitivity of $\f{J}$.  The sensitivity of $\q{Q}$ depends on the sensitivity of $\q{J}$.
+
+\subsection{Inhomogeneous term}
+
+\begin{equation}
+\begin{aligned}
+\partial_p \left[ \q{Q} f(\ve x, \ve y) \right] =
+(\partial_p \q{Q}) f(\ve x, \ve y)
++ \q{Q} \,
+\left[
+\partial_x f(\ve x, \ve y)^T \partial_p X(\ve r, \ve s)
++ \partial_y f(\ve x, \ve y)^T \partial_p Y(\ve r, \ve s)
++ \partial_p f(\ve x, \ve y)
+\right]
+\end{aligned}
+\end{equation}
+%
+Take the gradient of $f(\ve x, \ve y)$ using the gradient matrices.  (Why not?  It's assumed to be a polynomial.)
+%
+\begin{equation}
+\partial_p \left[ \q{Q} f(\ve x, \ve y) \right] =
+(\partial_p \q{Q}) f(\ve x, \ve y)
++ \q{Q} \,
+\left[
+(\f{D_x} \ve f)^T \partial_p X(\ve r, \ve s)
++ (\f{D_y} \ve f)^T \partial_p Y(\ve r, \ve s)
++ \partial_p f(\ve x, \ve y)
+\right].
+\end{equation}
+%
+I think I'm screwing up some tensor index thing here but I'm tired.  Check it later.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
