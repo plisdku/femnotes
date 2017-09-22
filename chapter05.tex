@@ -85,19 +85,54 @@ The sensitivity of $\f{D_x}$ was derived before (Equation \ref{eqn:gradient_matr
 Take the gradient of $f(\ve x, \ve y)$ using the gradient matrices.  (Why not?  It's assumed to be a polynomial.)
 %
 \begin{equation}
+\label{eqn:curvilinear_inhomogeneous_sensitivity}
 \partial_p \left[ \q{Q} f(\ve x, \ve y) \right] =
 (\partial_p \q{Q}) f(\ve x, \ve y)
 + \q{Q} \,
 \left[
-(\f{D_x} \ve f)^T \partial_p X(\ve r, \ve s)
-+ (\f{D_y} \ve f)^T \partial_p Y(\ve r, \ve s)
+(\f{D_x} \ve f) \operatorname{diag}\left( \partial_p X(\ve r, \ve s) \right)
++ (\f{D_y} \ve f) \operatorname{diag} \left( \partial_p Y(\ve r, \ve s) \right)
 + \partial_p f(\ve x, \ve y)
 \right].
 \end{equation}
+
+\subsection{Neumann edge term}
+
+Formally this should be very similar to the inhomogeneous area term.
 %
-I think I'm screwing up some tensor index thing here but I'm tired.  Check it later.
+\begin{equation}
+\partial_p (\q{Q}_\textrm{1d} \ve e_n) = (\partial_p \q{Q}_\textrm{1d}) \ve e_n(\ve x, \ve y) +
+\q{Q}_\textrm{1d} \left[ \pp{\ve e_n(\ve x, \ve y)}{\ve x} \pp{\ve x}{p} + \pp{\ve e_n(\ve x, \ve y)}{\ve y} \pp{\ve y}{p} + \pp{\ve e_n(\ve x, \ve y}{p} \right]
+\end{equation}
+%
+If $\ve e_n$ is evaluated on all nodes in the element then $D_x$ and $D_y$ could be used to evaluate its derivatives, like for $\ve f$ in the inhomogeneous term (Equation \ref{eqn:curvilinear_inhomogeneous_sensitivity}).  Do we care how it's done?  Much of the time $\ve e_n$ will be a constant anyway or have its values bound to nodes.
 
+\subsection{Pointwise evaluation functional}
 
+The functional sensitivity is
+%
+\begin{equation}
+\pp{}{p} f(u(x,y)) = \pp{f}{u} \left( \pp{I_f(R(x,y),S(x,y))}{p} \ve u + I_f(R(x,y),S(x,y)) \pp{\ve u}{p} \right)
+\end{equation}
+% 
+and $\partial_p I_f(R(x,y), S(x,y))$ is given by \ref{eqn:curvilinear_interpolation_sensitivity}.
+
+\subsection{Integral functional}
+
+The functional sensitivity is
+%
+\begin{equation}
+\begin{aligned}
+\pp{}{p} \int dx \, dy \, a(x,y) f(u(x,y)) &=
+\left( (D_x \ve a) \operatorname{diag} \left\{ \pp{X(\ve r, \ve s)}{p} \right\} + (D_y \ve a) \operatorname{diag} \left\{ \pp{Y(\ve r, \ve s)}{p} \right\} \right) \, Q \, f(I_{f \rightarrow q}(\ve u)) \\
+&+ \ve a(X(\ve r, \ve s), Y(\ve r, \ve s))\,  \pp{Q}{p} \, f(I_{f \rightarrow q}(\ve u)) \\
+&+ \ve a(X(\ve r, \ve s), Y(\ve r, \ve s)) \, Q \, \pp{f(I_{f \rightarrow q} \ve u)}{\ve u} \left( I_{f \rightarrow q} \pp{\ve u}{p} \right).
+\end{aligned}
+\end{equation}
+%
+In the last line, note that $\partial_p I_{f \rightarrow q} = \mathbb{0}$.  Also HEY THIS Q YOU ARE USING SHOULD NOT INCLUDE THE FINAL $I_{f \rightarrow q}$ IF YOU LOOK CAREFULLY.  REWRITE.
+
+%curvilinear_interpolation_sensitivity
 
 
 

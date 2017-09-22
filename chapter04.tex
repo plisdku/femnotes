@@ -31,14 +31,24 @@ R(x, y) \\ S(x,y)
 %
 When $X$ and $Y$ are polynomial functions of $r$ and $s$, $R$ and $S$ are not in general polynomials.  (Consider $X(r) = r^2$ and its non-polynomial inverse mapping $R(x) = \sqrt{x}$.)  I think we'll have to invert them numerically with \emph{e.g.} Newton's method.
 
-Define the coordinate transformations using nodal polynomials by the usual scheme.  Within a single element let the nodal coordinates in the reference simplex be $\g{\ve r}, \g{\ve s}$ which map to $\g{\ve x}, \g{\ve y}$.  Then to evaluate at query points $\q{\ve r}, \q{\ve s}$ use interpolation,
+Define the coordinate transformations using nodal polynomials by the usual scheme.  Within a single element let the nodal coordinates in the reference simplex be $\g{\ve r}, \g{\ve s}$ which map to $\g{\ve x}, \g{\ve y}$.  Then to evaluate at query points $\ve r, \ve s$ use interpolation,
 %
 \begin{equation}
 \begin{aligned}
-X(\q{\ve r}, \q{\ve s}) &= V(\q{\ve r}, \q{\ve s}) V(\g{\ve r}, \g{\ve s})^{-1} \g{\ve x} \\
-Y(\q{\ve r}, \q{\ve s}) &= V(\q{\ve r}, \q{\ve s}) V(\g{\ve r}, \g{\ve s})^{-1} \g{\ve y}.
+X(\ve r, \ve s) &= V(\ve r, \ve s) V(\g{\ve r}, \g{\ve s})^{-1} \g{\ve x} \\
+Y(\ve r, \ve s) &= V(\ve r, \ve s) V(\g{\ve r}, \g{\ve s})^{-1} \g{\ve y}.
 \end{aligned}
 \end{equation}
+
+Along element edges we can also define a one-dimensional coordinate system with a mapping
+%
+\begin{equation}
+\begin{aligned}
+X(\ve r) &= V_\textrm{1d}(\ve r) V_\textrm{1d}(\g{\ve r})^{-1} \g{\ve x} \\
+Y(\ve r) &= V_\textrm{1d}(\ve r) V_\textrm{1d}(\g{\ve r})^{-1} \g{\ve y}.
+\end{aligned}
+\end{equation}
+
 
 \subsection{Interpolation}
 
@@ -91,7 +101,19 @@ J(\ve r, \ve s) =
 \end{bmatrix}.
 \end{equation}
 %
-Pleasingly literal right?
+This expression should be interpreted as producing a $2 \times 2$ matrix at each point.
+
+The element edge Jacobian is
+%
+\begin{equation}
+J_\textrm{1d}(\ve r) =
+\begin{bmatrix}
+\g{D_r}(\ve r) \g{\ve x} \\
+\g{D_r}(\ve r) \g{\ve y}
+\end{bmatrix}.
+\end{equation}
+%
+It should be interpreted as a $2 \times 1$ matrix for each point.
 
 \subsection{Inverse coordinate transform}
 
@@ -214,11 +236,29 @@ Q \equiv I_{f \rightarrow q}^T V_q^{-T} V_q^{-1} \operatorname{diag}\{| \q{\ve J
 }%boxed
 \end{equation}
 
-For sensitivity analyses later I will differentiate $Q$ with respect to $\g{\ve x}$ and $\g{\ve y}$.  God save me, I will see it through!
-
 \subsection{Edge quadrature}
 
-Same formula but using edge interpolation matrices, edge Vandermonde matrices, and the edge Jacobian determinant.
+Same formula but using edge interpolation matrices, edge Vandermonde matrices, and the edge Jacobian determinant.  Along element edges we start with the pointwise Jacobian at all edge nodes,
+%
+\begin{equation}
+J_\textrm{1d}(\q{\ve r}) =
+\begin{bmatrix}
+\partial_r I_{\textrm{1d}, g \rightarrow q} \g{\ve x} \\
+\partial_r I_{\textrm{1d}, g \rightarrow q} \g{\ve y}
+\end{bmatrix}
+\end{equation}
+%
+The quadrature matrix along an element edge is
+%
+\begin{equation}
+\boxed{
+Q_\textrm{1d} \equiv I_{\textrm{1d}, f \rightarrow q}^T V_{\textrm{1d},q}^{-T} V_{\textrm{1d},q}^{-1} \operatorname{diag} \left\{ \sqrt{|J_{\textrm{1d},q}^T J_{\textrm{1d},q}|} \right\} I_{\textrm{1d},f \rightarrow q}.
+}%boxed
+\end{equation}
+%
+where the entire expression $\sqrt{|J^T J|}$ should be evaluated pointwise using $2 \times 1$ matrices at each quadrature point.
+
+For sensitivity analyses later I will differentiate $Q$ with respect to $\g{\ve x}$ and $\g{\ve y}$.  God save me, I will see it through!
 
 \section{Differentiation}
 
@@ -349,6 +389,30 @@ and for $\g{\ve y}$,
 %
 I am not enthused about trying to wrap this all up in tensor notation at the moment.  The upgrade to three dimensions might change my mind on that.  Perhaps I could use two tensors, $\ppp{J}{\g{\ve x}}$ and $\ppp{J}{\g{\ve y}}$, both in $\mathbb{R}^{2 \times 2 \times \frac{1}{2}N_g(N_g+1)}$.  That's not too bad.
 
+\subsubsection{Edge Jacobian sensitivity}
+
+Same thing for the same reasons.
+%
+\begin{equation}
+\label{eqn:edge_jacobian_sensitivity_x}
+\begin{aligned}
+\pp{j_{1}}{\g{\ve x}}(\ve r) &= \g{D_r}(\ve r) \\
+\pp{j_{2}}{\g{\ve x}}(\ve r) &= \mathbb{0}
+\end{aligned}
+\end{equation}
+%
+and for $\g{\ve y}$,
+%
+\begin{equation}
+\label{eqn:edge_jacobian_sensitivity_y}
+\begin{aligned}
+\pp{j_{1}}{\g{\ve y}}(\ve r) &= \mathbb{0} \\
+\pp{j_{2}}{\g{\ve y}}(\ve r) &= \g{D_r}(\ve r).
+\end{aligned}
+\end{equation}
+%
+
+
 \subsection{Inverse Jacobian sensitivity}
 
 Work pointwise, one parameter at a time, \emph{e.g.}
@@ -359,6 +423,8 @@ Work pointwise, one parameter at a time, \emph{e.g.}
 %
 This will be vile any way you look at it.  Differentiating $K$ with respect to elements of $J$ (Equation \ref{eqn:jacobian_jacobian_sensitivity}) might still be a nice intermediate step.  I have my doubts.  In practice I would probably calculate two tensor variables $\ppp{K}{\g{\ve x}}$ and $\ppp{K}{\g{\ve y}}$ in $\mathbb{R}^{2 \times 2 \times \frac{1}{2}N_g(N_g+1)}$.
 
+The edge coordinate mapping is not invertible.
+
 \subsection{Jacobian determinant sensitivity}
 
 No room for improvement on Equation \ref{eqn:jacobian_determinant_sensitivity}, which was
@@ -368,6 +434,16 @@ No room for improvement on Equation \ref{eqn:jacobian_determinant_sensitivity}, 
 \end{equation}
 %
 If it comes in handy, note that $\operatorname{Tr}(AB) = A^T : B$ (matrix dot matrix, a scalar).
+
+For the edge Jacobian, it gets a little grosser:
+%
+\begin{equation}
+\label{eqn:edge_jacobian_determinant_sensitivity}
+\pp{}{p} \sqrt{|J(r)^T J(r)|} = \sqrt{|J(r)^T J(r)|} \operatorname{Tr}\left(
+[J(r)^T J(r)]^{-1} \left( \pp{J(r)^T}{p} J(r) + J(r)^T \pp{J(r)}{p} \right) \right).
+\end{equation}
+%
+At some point it must be easier to just differentiate numerically, right?
 
 \subsection{Gradient matrix sensitivity}
 
@@ -392,6 +468,7 @@ u(\ve x, \ve y) = I_f(R(\ve x, \ve y), S(\ve x, \ve y)) u(\f{\ve r}, \f{\ve s}).
 We want to calculate $\ppp{u}{\g{\ve x}}$ and $\ppp{u}{\g{\ve y}}$.  These sensitivities reflect the change of $u$ as the mesh shifts under the measurement point.  We abbreviate $\ve r = R(\ve x, \ve y)$ and $\ve s = S(\ve x, \ve y)$ with the understanding that $\ve x$ and $\ve y$ are the independent variables.  This is a three-dimensional tensorial derivative because it has indices for the query points $x_i, y_i$, the field samples $u_j$ located on $\f{\ve r}, \f{\ve s}$, and the geometry nodal coordinates $\g{x}_k, \g{y}_k$.
 %
 \begin{equation}
+\label{eqn:curvilinear_interpolation_sensitivity}
 \pp{}{\g{x}_k} I_f(r_i, s_i)_j = \f{D}_r(r_i, s_i)_j \pp{R}{\g{x}_k}(x_i, y_i) + \f{D}_s(r_i, s_i) \pp{S}{\g{x}_k}(x_i, y_i).
 \end{equation}
 %
@@ -424,7 +501,15 @@ This Jacobian is evaluated at quadrature nodes $\q{r}, \q{s}$.  So for instance 
 \pp{j_{11}}{\g{\ve x}}(\q{\ve r}, \q{\ve s}) = \g{D}_r(\q{\ve r}, \q{\ve s}) \in \mathbb{R}^{\frac{1}{2}N_q(N_q+1) \times \frac{1}{2}N_g(N_g+1)}.
 \end{equation}
 
-
+The edge quadrature sensitivity is roughly the same:
+%
+\begin{equation}
+\pp{Q_\textrm{1d}}{p} = I_{\textrm{1d},f \rightarrow q}^T V_{\textrm{1d},q}^{-T} V_{\textrm{1d},q}^{-1}
+\operatorname{diag}\left( \pp{}{p} \sqrt{|J_{\textrm{1d},q}^T J_{\textrm{1d},q}|} \right)
+I_{\textrm{1d}, f \rightarrow q}
+\end{equation}
+%
+and the sensitivity of the Jacobian term follows from equations \ref{eqn:edge_jacobian_sensitivity_x}, \ref{eqn:edge_jacobian_sensitivity_y}, and \ref{eqn:edge_jacobian_determinant_sensitivity}.
 
 
 
